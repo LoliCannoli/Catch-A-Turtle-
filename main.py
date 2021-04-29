@@ -1,20 +1,85 @@
 import turtle
 import random
-import time
 import math
 
-Colors = ['Pink', 'lightblue', 'white']
-Shapes = ['circle', 'turtle', 'classic']
+Colours = ['Pink', 'lightblue', 'white']
+colour = random.choice(Colours)
+shape = 'circle'
+size = 4
 
-color = random.choice(Colors)
-shape = random.choice(Shapes)
-size = 2
-score = 0
-timer = 50000000
+timer = 5
 timerFinished = False
 counter_interval = 1000
 
 font = ('Courier New', 20, 'bold')
+
+score = 0
+pointsToAdd = 1
+
+runner = turtle.Turtle()
+runner.fillcolor(colour)
+runner.shape(shape)
+runner.shapesize(size)
+runner.speed(10)
+runner.penup()
+runner.onclick(lambda x, y: addPoints())
+
+def getNewCords():
+    newX = random.randint(-400, 400)
+    newY = random.randint(-300, 300)
+    return newX, newY
+
+def moveToNewLocation():
+    global timerFinished
+
+    if not timerFinished:
+        runner.showturtle()
+        newX, newY = getNewCords()
+        runner.goto(newX, newY)
+    else:
+        return
+
+
+scoreWritter = turtle.Turtle()
+scoreWritter.hideturtle()
+scoreWritter.penup()
+scoreWritter.goto(-80, 250)
+
+def addPoints():
+    global score, pointsToAdd
+
+    if runner.isvisible():
+        turtle.hideturtle()
+        score += pointsToAdd
+
+        scoreWritter.clear()
+        scoreWritter.write('Score: ' + str(score) , font = font)
+        moveToNewLocation()
+
+def findHeading(x1, y1, x2, y2):
+    #I had to restudy geometry for this T~T
+    y = y2 -y1
+    x = x2 - x1
+
+    degrees = math.degrees(math.atan2(y,x))
+    print('Degress: ' + str(degrees))
+    return degrees - 90
+
+def findDistance(x1, y1, x2, y2):
+    unroot = ((x2 - x1)**2) + ((y2 - y1)**2)
+    distance = math.sqrt(unroot)
+    print('Distance:' + str(distance))
+    return distance / 2
+
+def moveInArc():
+    currentX, currentY = runner.xcor(), runner.ycor()
+
+    newX, newY = getNewCords()
+
+    runner.showturtle()
+    runner.setheading(findHeading(currentX, currentY, newX, newY))
+    runner.circle(findDistance(currentX, currentY, newX, newY), 180)
+    runner.hideturtle()
 
 counter = turtle.Turtle()
 counter.hideturtle()
@@ -33,70 +98,12 @@ def countdown():
         timer -= 1
         counter.getscreen().ontimer(countdown, counter_interval)
 
-scoreWritter = turtle.Turtle()
-scoreWritter.hideturtle()
-scoreWritter.penup()
-scoreWritter.goto(-80, 250)
-
-def updateScore(points):
-    global score
-    score += points
-    scoreWritter.clear()
-    scoreWritter.write('Score: ' + str(score) , font = font)
-
-def spotClicked():
-    global timerFinished
-    if not timerFinished:
-        changePosition()
-        updateScore(1)
-    else:
-        return
-
-runner = turtle.Turtle()
-runner.fillcolor(color)
-runner.shape(shape)
-runner.shapesize(size)
-runner.penup()
-runner.speed(10)
-runner.onclick(lambda x, y: spotClicked())
-
-def findHeading(curX, curY, newX, newY):
-    #I had to restudy geometry for this T~T
-    y = newY -curY
-    x = newX - curX
-
-    degrees = math.degrees(math.atan2(y,x))
-    print('Degress: ' + str(degrees))
-    return degrees - 90
-
-def findDistance(x1, y1, x2, y2):
-    unroot = ((x2 - x1)**2) + ((y2 - y1)**2)
-    distance = math.sqrt(unroot)
-    print('Distance:' + str(distance))
-    return distance / 2
-
-pointPloter = turtle.Turtle()
-pointPloter.hideturtle()
-pointPloter.shape('circle')
-pointPloter.penup()
-
-def changePosition():
-    currentX, currentY = runner.xcor(), runner.ycor()
-
-    newX = random.randint(-400, 400)
-    newY = random.randint(-300, 300)
-
-    pointPloter.goto(newX, newY)
-    pointPloter.stamp()
-
-    print('New cords: ' + str(newX) + ', ' + str(newY))
-
-    runner.showturtle()
-    runner.setheading(findHeading(currentX, currentY, newX, newY))
-    runner.circle(findDistance(currentX, currentY, newX, newY), 180)
-    runner.hideturtle()
-
 window = turtle.Screen()
-window.ontimer(countdown, counter_interval)
 window.bgcolor('gray')
+window.ontimer(countdown, counter_interval)
+
+while not timerFinished:
+    moveInArc()
+    moveToNewLocation()
+
 window.mainloop()
