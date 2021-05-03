@@ -1,6 +1,11 @@
+#Test scoreboard notice
+
+import leaderboard
 import turtle
 import random
 import math
+
+playerName = input('What is your name')
 
 Colours = ['Pink', 'lightblue', 'white']
 colour = random.choice(Colours)
@@ -13,14 +18,14 @@ counter_interval = 1000
 
 font = ('Courier New', 20, 'bold')
 
-score = 0
+score = 10
 pointsToAdd = 1
 
 runner = turtle.Turtle()
 runner.fillcolor(colour)
 runner.shape(shape)
 runner.shapesize(size)
-runner.speed(10)
+runner.speed(8)
 runner.penup()
 runner.onclick(lambda x, y: addPoints())
 
@@ -105,5 +110,22 @@ window.ontimer(countdown, counter_interval)
 while not timerFinished:
     moveInArc()
     moveToNewLocation()
+
+leaderboardTurtle = turtle.Turtle()
+leaderboardTurtle.hideturtle()
+leaderboardTurtle.penup()
+leaderboardTurtle.goto(leaderboardTurtle.xcor() - 75, leaderboardTurtle.ycor())
+
+if(timerFinished):
+    runner.hideturtle()
+    leaderboard.addItemToLeaderboard(playerName, score)
+    topThreeList = leaderboard.getTopX(3)
+    for player in ltopThreeList:
+        leaderboardTurtle.write(player, font = font)
+        leaderboardTurtle.goto(leaderboardTurtle.xcor(), leaderboardTurtle.ycor() - 30)
+
+    if (playerName + ' - ' + str(score) in topThreeList):
+        print('You made the leaderboard')
+
 
 window.mainloop()
